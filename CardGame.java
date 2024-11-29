@@ -1,42 +1,61 @@
-//package linkedLists;
-
+// Jesus Rosalez
+// 11 - 29 - 24
+// Card Game
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-//import java.util.ArrayList;
-//import java.util.List;
-import java.util.Scanner;
-
-
 
 public class CardGame {
-	
-	private static LinkList cardList = new LinkList();  // make list
+    private static LinkList cardList = new LinkList();
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
+        String fileName = "cards.txt";
 
-		// File name to read from
-        String fileName = "cards.txt"; // Ensure the file is in the working directory or specify the full path
+        // Load cards from the file
+        loadCardsFromFile(fileName);
 
-        // Read the file and create Card objects
-        try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+        // Shuffle the deck (add a shuffle method to LinkList if not already present)
+        cardList.shuffle();
+
+        // Display the shuffled deck
+        System.out.println("Shuffled deck:");
+        cardList.displayList();
+
+        // Draw 5 cards for the player
+        System.out.println("Drawing 5 cards for the player...");
+        for (int i = 0; i < 5; i++) {
+            Card drawnCard = cardList.getFirst();
+            if (drawnCard != null) {
+                System.out.println("Drawn Card: " + drawnCard);
+            } else {
+                System.out.println("No more cards to draw.");
+                break;
+            }
+        }
+
+        // Display the remaining deck
+        System.out.println("\nRemaining deck:");
+        cardList.displayList();
+    }
+
+    //Reads card data from a file and loads them into the card list.
+    private static void loadCardsFromFile(String fileName) {
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(fileName));
             String line;
+
             while ((line = br.readLine()) != null) {
-                // Split the line into components
-                String[] details = line.split(","); // Assuming comma-separated values
+                // Split the line into card attributes
+                String[] details = line.split(",");
                 if (details.length == 4) {
-                    // Parse card details
                     String suit = details[0].trim();
                     String name = details[1].trim();
                     int value = Integer.parseInt(details[2].trim());
                     String pic = details[3].trim();
 
-                    // Create a new Card object
+                    // Create a new card and add it to the list
                     Card card = new Card(suit, name, value, pic);
-
-                    // Add the Card object to the list
                     cardList.add(card);
                 } else {
                     System.err.println("Invalid line format: " + line);
@@ -44,24 +63,13 @@ public class CardGame {
             }
         } catch (IOException e) {
             System.err.println("Error reading file: " + e.getMessage());
+        } finally {
+            // Close the BufferedReader
+            try {
+                if (br != null) br.close();
+            } catch (IOException e) {
+                System.err.println("Error closing the file: " + e.getMessage());
+            }
         }
-
-        // Print the loaded cards
-        System.out.println("Cards loaded:");
-        cardList.displayList();
-		
-		Card[] playerHand = new Card[5];
-		for(int i = 0; i < playerHand.length; i++)
-			playerHand[i] = cardList.getFirst();
-		
-		System.out.println("players hand");
-		for(int i = 0; i < playerHand.length; i++)
-			System.out.println(playerHand[i]);
-		
-		System.out.println();
-		System.out.println("the deck");
-		cardList.displayList();
-
-	}//end main
-
-}//end class
+    }
+}
